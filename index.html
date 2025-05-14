@@ -1,142 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Random Question Picker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 5vh 2vw;
-      background: #f9f9f9;
-    }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 6vh 4vw;
+    background: #f9f9f9;
+  }
 
+  h1 {
+    font-size: 2.8rem;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+  }
+
+  select, button {
+    font-size: 1.5rem;
+    padding: 1rem 1.5rem;
+    margin: 1rem auto;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: block;
+    width: 90%;
+    max-width: 400px;
+  }
+
+  button {
+    background: #4CAF50;
+    color: white;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #45a049;
+  }
+
+  select {
+    background: #eeeeee;
+  }
+
+  #question {
+    margin-top: 2.5rem;
+    font-size: 1.8rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    word-wrap: break-word;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
+      font-size: 2rem;
     }
 
     select, button {
-      font-size: 1.2rem;
-      padding: 0.75rem 1.5rem;
-      margin: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: block;
-      width: 90%;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    button {
-      background: #4CAF50;
-      color: white;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #45a049;
-    }
-
-    select {
-      background: #eeeeee;
+      font-size: 1.3rem;
+      padding: 0.9rem;
     }
 
     #question {
-      margin-top: 2rem;
       font-size: 1.6rem;
-      min-height: 4rem;
-      padding: 1rem;
-      background: white;
-      display: inline-block;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 90%;
-      word-wrap: break-word;
+      padding: 1.2rem;
     }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-
-      select, button {
-        font-size: 1rem;
-        padding: 0.6rem 1.2rem;
-      }
-
-      #question {
-        font-size: 1.4rem;
-        padding: 0.8rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <h1>🎰 社交尷尬救援神器</h1>
-
-  <!-- Sheet selector -->
-  <div>
-    <select id="sheetSelector" onchange="loadQuestions()">
-      <option value="基礎題庫">關於性幻想</option>
-      <option value="主題Special">基礎題庫</option>
-    </select>
-  </div>
-
-  <!-- Question Display -->
-  <div id="question">Select a category and press the button</div>
-
-  <!-- Button -->
-  <div>
-    <button onclick="pickRandom()">Click Me</button>
-  </div>
-
-  <script>
-    let questions = [];
-    const SHEET_URL_BASE = "https://script.google.com/macros/s/AKfycbxN4WwmAV0roFNNEerLuwv1LLNQiIucENZ9-dS8FAMMSkxZduC-QZ4NzFZ0jxPtrGsa/exec";
-
-    function loadQuestions() {
-      const sheetName = document.getElementById("sheetSelector").value;
-      const url = `${SHEET_URL_BASE}?sheet=${encodeURIComponent(sheetName)}`;
-      document.getElementById("question").innerText = "Loading...";
-
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            document.getElementById("question").innerText = data.error;
-            questions = [];
-          } else {
-            questions = data;
-            document.getElementById("question").innerText = "點擊抽一個問題！";
-          }
-        })
-        .catch(err => {
-          document.getElementById("question").innerText = "Failed to load questions.";
-          console.error("Error loading questions:", err);
-        });
-    }
-
-    function pickRandom() {
-      if (questions.length === 0) {
-        document.getElementById("question").innerText = "No questions loaded.";
-        return;
-      }
-
-      let count = 0;
-      const display = document.getElementById("question");
-      const interval = setInterval(() => {
-        const rand = Math.floor(Math.random() * questions.length);
-        display.innerText = questions[rand];
-        count++;
-        if (count > 20) clearInterval(interval);
-      }, 100);
-    }
-
-    window.onload = loadQuestions;
-  </script>
-</body>
-</html>
+  }
+</style>
