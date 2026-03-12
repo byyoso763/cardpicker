@@ -1,98 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Random Question Picker</title>
+<script>
+  let questions = [];
+  let currentIndex = 0;
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 6vh 4vw;
-      background: #f9f9f9;
-    }
-    h1 {
-      font-size: 2.8rem;
-      margin-bottom: 2rem;
-    }
-    button {
-      font-size: 1.5rem;
-      margin-top: 2rem;
-      padding: 1rem 1.5rem;
-      border: none;
-      border-radius: 10px;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    #question {
-      margin-top: 2.5rem;
-      margin-bottom: 2rem; 
-      font-size: 1.8rem;
-      padding: 1.5rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 90%;
-      margin: auto;
-      line-height: 1.6;
-    }
-  </style>
-</head>
-<body>
-  <h1>🎰 聊聊題庫</h1>
+  const SHEET_NAME = "基礎題庫";
+  const SHEET_URL_BASE = "https://script.google.com/macros/s/AKfycbxN4WwmAV0roFNNEerLuwv1LLNQiIucENZ9-dS8FAMMSkxZduC-QZ4NzFZ0jxPtrGsa/exec";
+  const url = `${SHEET_URL_BASE}?sheet=${encodeURIComponent(SHEET_NAME)}`;
 
-  <div id="question">Loading...</div>
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
 
-  <div>
-    <button onclick="pickRandom()">Click Me</button>
-  </div>
+  function loadQuestions() {
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("question").innerText = data.error;
+          questions = [];
+        } else {
+          questions = data;
 
-  <script>
-    let questions = [];
-    const SHEET_NAME = "基礎題庫";  // ✅ hardcoded
-    const SHEET_URL_BASE = "https://script.google.com/macros/s/AKfycbxN4WwmAV0roFNNEerLuwv1LLNQiIucENZ9-dS8FAMMSkxZduC-QZ4NzFZ0jxPtrGsa/exec";
-    const url = `${SHEET_URL_BASE}?sheet=${encodeURIComponent(SHEET_NAME)}`;
+          shuffle(questions);   // ✅ 洗牌
+          currentIndex = 0;
 
-    function loadQuestions() {
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            document.getElementById("question").innerText = data.error;
-            questions = [];
-          } else {
-            questions = data;
-            document.getElementById("question").innerText = "點擊抽一個問題！";
-          }
-        })
-        .catch(err => {
-          document.getElementById("question").innerText = "Failed to load questions.";
-          console.error("Error loading questions:", err);
-        });
+          document.getElementById("question").innerText = "點擊抽一個問題！";
+        }
+      })
+      .catch(err => {
+        document.getElementById("question").innerText = "Failed to load questions.";
+        console.error("Error loading questions:", err);
+      });
+  }
+
+  function pickRandom() {
+    const display = document.getElementById("question");
+
+    if (currentIndex >= questions.length) {
+      display.innerText = "題庫已抽完！";
+      return;
     }
 
-    function pickRandom() {
-      if (questions.length === 0) {
-        document.getElementById("question").innerText = "No questions loaded.";
-        return;
+    let count = 0;
+
+    const interval = setInterval(() => {
+      const rand = Math.floor(Math.random() * questions.length);
+      display.innerText = questions[rand];
+
+      count++;
+
+      if (count > 20) {
+        clearInterval(interval);
+
+        display.innerText = questions[currentIndex];
+        currentIndex++;   // ✅ 下一題
       }
+    }, 100);
+  }
 
-      let count = 0;
-      const display = document.getElementById("question");
-      const interval = setInterval(() => {
-        const rand = Math.floor(Math.random() * questions.length);
-        display.innerText = questions[rand];
-        count++;
-        if (count > 20) clearInterval(interval);
-      }, 100);
-    }
-
-    window.onload = loadQuestions;
-  </script>
-</body>
-</html>
+  window.onload = loadQuestions;
+</script>
